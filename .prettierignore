@@ -1,0 +1,17 @@
+# 의존성
+node_modules/
+
+# 빌드 출력
+dist/
+build/
+coverage/
+
+# 설정 파일
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 문서 출력
+docs/generated/
+swagger-output/
+openapi-output/

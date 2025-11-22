@@ -1,0 +1,62 @@
+# 의존성
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 빌드 출력
+dist/
+build/
+*.tsbuildinfo
+
+# 테스트 커버리지
+coverage/
+.nyc_output/
+*.lcov
+
+# Jest 캐시
+.jest-cache/
+
+# 환경 변수
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 로그
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS 파일
+.DS_Store
+Thumbs.db
+
+# IDE 설정
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.history/
+
+# 임시 파일
+tmp/
+temp/
+*.tmp
+*.temp
+
+# 생성된 문서 (개발 중)
+docs/generated/
+swagger-output/
+openapi-output/
+
+# Serena MCP
+.serena/
+
+# Claude Code
+.order/

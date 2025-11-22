@@ -1,0 +1,15 @@
+# 의존성
+node_modules/
+
+# 빌드 출력
+dist/
+build/
+coverage/
+
+# 설정 파일
+*.config.js
+*.config.ts
+.eslintrc.js
+
+# Jest 캐시
+.jest-cache/
