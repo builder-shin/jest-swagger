@@ -1,30 +1,30 @@
-# 마이그레이션 가이드
+# Migration Guide
 
-**한국어** | [English](./MIGRATION.en.md)
+[한국어](./MIGRATION.md) | **English**
 
-다른 도구에서 jest-swagger로 마이그레이션하는 방법을 안내합니다.
+This guide helps you migrate to jest-swagger from other tools.
 
-## 목차
+## Table of Contents
 
-1. [Supertest + Swagger-JSDoc에서 마이그레이션](#1-supertest--swagger-jsdoc에서-마이그레이션)
-2. [NestJS Swagger에서 마이그레이션](#2-nestjs-swagger에서-마이그레이션)
-3. [Swagger-Autogen에서 마이그레이션](#3-swagger-autogen에서-마이그레이션)
-4. [수동 OpenAPI 문서에서 마이그레이션](#4-수동-openapi-문서에서-마이그레이션)
+1. [Migrating from Supertest + Swagger-JSDoc](#1-migrating-from-supertest--swagger-jsdoc)
+2. [Migrating from NestJS Swagger](#2-migrating-from-nestjs-swagger)
+3. [Migrating from Swagger-Autogen](#3-migrating-from-swagger-autogen)
+4. [Migrating from Manual OpenAPI Documentation](#4-migrating-from-manual-openapi-documentation)
 
 ---
 
-## 1. Supertest + Swagger-JSDoc에서 마이그레이션
+## 1. Migrating from Supertest + Swagger-JSDoc
 
-### 이전 방식
+### Previous Approach
 
-**이전 코드 (Swagger-JSDoc):**
+**Previous Code (Swagger-JSDoc):**
 
 ```typescript
 /**
  * @swagger
  * /users:
  *   post:
- *     summary: 사용자 생성
+ *     summary: Create user
  *     tags: [users]
  *     requestBody:
  *       required: true
@@ -39,7 +39,7 @@
  *                 type: string
  *     responses:
  *       201:
- *         description: 생성됨
+ *         description: Created
  */
 describe('POST /users', () => {
   it('should create a user', async () => {
@@ -55,21 +55,21 @@ describe('POST /users', () => {
 });
 ```
 
-### jest-swagger 방식
+### jest-swagger Approach
 
-**마이그레이션 후:**
+**After Migration:**
 
 ```typescript
 import { Api, Path, Response } from 'jest-swagger';
 
-describe('사용자 API', () => {
+describe('User API', () => {
   @Api({
     tags: ['users'],
-    summary: '사용자 생성',
+    summary: 'Create user',
   })
   @Path('post', '/users')
   @Response(201, {
-    description: '생성됨',
+    description: 'Created',
     content: {
       'application/json': {
         schema: {
@@ -83,7 +83,7 @@ describe('사용자 API', () => {
       },
     },
   })
-  test('사용자를 생성할 수 있어야 함', async () => {
+  test('should create a user', async () => {
     const response = await request(app)
       .post('/users')
       .send({
@@ -96,26 +96,26 @@ describe('사용자 API', () => {
 });
 ```
 
-### 주요 차이점
+### Key Differences
 
-| 항목 | Swagger-JSDoc | jest-swagger |
+| Item | Swagger-JSDoc | jest-swagger |
 |------|---------------|--------------|
-| 문서 위치 | JSDoc 주석 | 데코레이터 |
-| 타입 안전성 | ❌ 없음 | ✅ TypeScript 지원 |
-| 테스트 통합 | 분리됨 | 통합됨 |
-| 자동 생성 | 별도 설정 필요 | Jest 리포터로 자동 |
-| 타입 생성 | 지원 안 함 | TypeGenerator 제공 |
+| Documentation Location | JSDoc comments | Decorators |
+| Type Safety | ❌ None | ✅ TypeScript support |
+| Test Integration | Separated | Integrated |
+| Auto Generation | Requires separate setup | Automatic via Jest reporter |
+| Type Generation | Not supported | TypeGenerator provided |
 
-### 마이그레이션 단계
+### Migration Steps
 
-#### 1단계: jest-swagger 설치
+#### Step 1: Install jest-swagger
 
 ```bash
 npm uninstall swagger-jsdoc
 npm install --save-dev jest-swagger
 ```
 
-#### 2단계: Jest 설정 업데이트
+#### Step 2: Update Jest Configuration
 
 `jest.config.ts`:
 
@@ -128,7 +128,7 @@ export default {
       {
         outputPath: './docs/swagger.yaml',
         format: 'yaml',
-        title: 'API 문서',
+        title: 'API Documentation',
         version: '1.0.0',
       },
     ],
@@ -136,9 +136,9 @@ export default {
 };
 ```
 
-#### 3단계: JSDoc 주석을 데코레이터로 변환
+#### Step 3: Convert JSDoc Comments to Decorators
 
-자동 변환 스크립트를 사용할 수 있습니다:
+You can use an automated conversion script:
 
 ```typescript
 // scripts/migrate-from-jsdoc.ts
@@ -147,14 +147,14 @@ import * as fs from 'fs';
 function convertJSDocToDecorators(filePath: string): void {
   const content = fs.readFileSync(filePath, 'utf-8');
 
-  // JSDoc 주석 파싱 및 데코레이터로 변환
-  // (실제 변환 로직)
+  // Parse JSDoc comments and convert to decorators
+  // (actual conversion logic)
 
   fs.writeFileSync(filePath, convertedContent);
 }
 ```
 
-#### 4단계: 테스트 실행 및 검증
+#### Step 4: Run Tests and Verify
 
 ```bash
 npm test
@@ -162,11 +162,11 @@ npm test
 
 ---
 
-## 2. NestJS Swagger에서 마이그레이션
+## 2. Migrating from NestJS Swagger
 
-### 이전 방식
+### Previous Approach
 
-**이전 코드 (NestJS):**
+**Previous Code (NestJS):**
 
 ```typescript
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -174,8 +174,8 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 @ApiTags('users')
 export class UsersController {
   @Post()
-  @ApiOperation({ summary: '사용자 생성' })
-  @ApiResponse({ status: 201, description: '생성됨' })
+  @ApiOperation({ summary: 'Create user' })
+  @ApiResponse({ status: 201, description: 'Created' })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
@@ -193,21 +193,21 @@ describe('UsersController', () => {
 });
 ```
 
-### jest-swagger 방식
+### jest-swagger Approach
 
-**마이그레이션 후:**
+**After Migration:**
 
 ```typescript
 import { Api, Path, Response } from 'jest-swagger';
 
-describe('사용자 컨트롤러', () => {
+describe('User Controller', () => {
   @Api({
     tags: ['users'],
-    summary: '사용자 생성',
+    summary: 'Create user',
   })
   @Path('post', '/users')
   @Response(201, {
-    description: '생성됨',
+    description: 'Created',
     content: {
       'application/json': {
         schema: {
@@ -221,7 +221,7 @@ describe('사용자 컨트롤러', () => {
       },
     },
   })
-  test('사용자를 생성할 수 있어야 함', async () => {
+  test('should create a user', async () => {
     const result = await controller.create({
       name: 'John Doe',
       email: 'john@example.com',
@@ -232,20 +232,20 @@ describe('사용자 컨트롤러', () => {
 });
 ```
 
-### 주요 차이점
+### Key Differences
 
-| 항목 | NestJS Swagger | jest-swagger |
+| Item | NestJS Swagger | jest-swagger |
 |------|----------------|--------------|
-| 적용 위치 | 컨트롤러 클래스 | 테스트 파일 |
-| 프레임워크 | NestJS 전용 | 프레임워크 독립적 |
-| DTO 사용 | 클래스 기반 | 스키마 기반 |
-| 문서 생성 | 런타임 | 테스트 실행 시 |
+| Application Location | Controller classes | Test files |
+| Framework | NestJS-specific | Framework-agnostic |
+| DTO Usage | Class-based | Schema-based |
+| Documentation Generation | Runtime | During test execution |
 
-### 마이그레이션 단계
+### Migration Steps
 
-#### 1단계: 기존 DTO를 스키마로 변환
+#### Step 1: Convert Existing DTOs to Schemas
 
-**이전 (NestJS DTO):**
+**Previous (NestJS DTO):**
 
 ```typescript
 import { ApiProperty } from '@nestjs/swagger';
@@ -259,7 +259,7 @@ export class CreateUserDto {
 }
 ```
 
-**변환 후 (jest-swagger 스키마):**
+**After Conversion (jest-swagger schema):**
 
 ```typescript
 const CreateUserSchema = {
@@ -272,16 +272,16 @@ const CreateUserSchema = {
 };
 ```
 
-#### 2단계: 컨트롤러 데코레이터를 테스트 데코레이터로 변환
+#### Step 2: Convert Controller Decorators to Test Decorators
 
-변환 매핑:
+Conversion mapping:
 
 - `@ApiTags()` → `@Api({ tags: [...] })`
 - `@ApiOperation()` → `@Api({ summary: '...' })`
 - `@ApiResponse()` → `@Response(status, { ... })`
 - `@ApiParam()` → `@Parameter({ ... })`
 
-#### 3단계: E2E 테스트에 데코레이터 추가
+#### Step 3: Add Decorators to E2E Tests
 
 ```typescript
 import { Api, Path, Response } from 'jest-swagger';
@@ -289,10 +289,10 @@ import { Api, Path, Response } from 'jest-swagger';
 describe('Users E2E', () => {
   @Api({
     tags: ['users'],
-    summary: '사용자 생성',
+    summary: 'Create user',
   })
   @Path('post', '/users')
-  @Response(201, { description: '생성됨' })
+  @Response(201, { description: 'Created' })
   test('POST /users', () => {
     return request(app.getHttpServer())
       .post('/users')
@@ -304,11 +304,11 @@ describe('Users E2E', () => {
 
 ---
 
-## 3. Swagger-Autogen에서 마이그레이션
+## 3. Migrating from Swagger-Autogen
 
-### 이전 방식
+### Previous Approach
 
-**이전 코드 (Swagger-Autogen):**
+**Previous Code (Swagger-Autogen):**
 
 ```javascript
 const swaggerAutogen = require('swagger-autogen')();
@@ -316,7 +316,7 @@ const swaggerAutogen = require('swagger-autogen')();
 const doc = {
   info: {
     title: 'My API',
-    description: 'API 문서',
+    description: 'API Documentation',
   },
   host: 'localhost:3000',
 };
@@ -326,29 +326,29 @@ const endpointsFiles = ['./src/routes/*.js'];
 
 swaggerAutogen(outputFile, endpointsFiles, doc);
 
-// 라우트 파일
+// Route file
 app.post('/users', (req, res) => {
   /* #swagger.tags = ['Users']
-     #swagger.description = '사용자 생성' */
+     #swagger.description = 'Create user' */
   res.status(201).json({ message: 'Created' });
 });
 ```
 
-### jest-swagger 방식
+### jest-swagger Approach
 
-**마이그레이션 후:**
+**After Migration:**
 
 ```typescript
 import { Api, Path, Response } from 'jest-swagger';
 
-describe('사용자 API', () => {
+describe('User API', () => {
   @Api({
     tags: ['users'],
-    summary: '사용자 생성',
+    summary: 'Create user',
   })
   @Path('post', '/users')
   @Response(201, {
-    description: '생성됨',
+    description: 'Created',
     content: {
       'application/json': {
         schema: {
@@ -360,7 +360,7 @@ describe('사용자 API', () => {
       },
     },
   })
-  test('POST /users - 사용자 생성', async () => {
+  test('POST /users - Create user', async () => {
     const response = await request(app).post('/users').send({
       name: 'John',
       email: 'john@example.com',
@@ -371,27 +371,27 @@ describe('사용자 API', () => {
 });
 ```
 
-### 마이그레이션 단계
+### Migration Steps
 
-#### 1단계: swagger-autogen 제거
+#### Step 1: Remove swagger-autogen
 
 ```bash
 npm uninstall swagger-autogen
 npm install --save-dev jest-swagger
 ```
 
-#### 2단계: 주석을 데코레이터로 변환
+#### Step 2: Convert Comments to Decorators
 
-변환 매핑:
+Conversion mapping:
 
 - `#swagger.tags` → `@Api({ tags: [...] })`
 - `#swagger.description` → `@Api({ summary: '...' })`
 - `#swagger.responses` → `@Response()`
 - `#swagger.parameters` → `@Parameter()`
 
-#### 3단계: 빌드 스크립트 업데이트
+#### Step 3: Update Build Scripts
 
-**이전:**
+**Previous:**
 
 ```json
 {
@@ -402,7 +402,7 @@ npm install --save-dev jest-swagger
 }
 ```
 
-**변경 후:**
+**After:**
 
 ```json
 {
@@ -415,26 +415,26 @@ npm install --save-dev jest-swagger
 
 ---
 
-## 4. 수동 OpenAPI 문서에서 마이그레이션
+## 4. Migrating from Manual OpenAPI Documentation
 
-### 이전 방식
+### Previous Approach
 
-**수동으로 작성된 OpenAPI 문서 (`swagger.yaml`):**
+**Manually Written OpenAPI Documentation (`swagger.yaml`):**
 
 ```yaml
 openapi: 3.0.0
 info:
-  title: 사용자 API
+  title: User API
   version: 1.0.0
 paths:
   /users:
     post:
-      summary: 사용자 생성
+      summary: Create user
       tags:
         - users
       responses:
         '201':
-          description: 생성됨
+          description: Created
           content:
             application/json:
               schema:
@@ -446,22 +446,22 @@ paths:
                     type: string
 ```
 
-### jest-swagger 방식
+### jest-swagger Approach
 
-#### 옵션 1: 기존 문서 유지 + 테스트 추가
+#### Option 1: Keep Existing Documentation + Add Tests
 
 ```typescript
 import { Api, Path, Response } from 'jest-swagger';
 
-// 기존 swagger.yaml은 유지하고, 테스트에만 데코레이터 추가
-describe('사용자 API', () => {
+// Keep existing swagger.yaml and only add decorators to tests
+describe('User API', () => {
   @Api({
     tags: ['users'],
-    summary: '사용자 생성',
+    summary: 'Create user',
   })
   @Path('post', '/users')
   @Response(201, {
-    description: '생성됨',
+    description: 'Created',
     content: {
       'application/json': {
         schema: {
@@ -474,20 +474,20 @@ describe('사용자 API', () => {
       },
     },
   })
-  test('사용자 생성', async () => {
-    // 테스트 코드
+  test('Create user', async () => {
+    // Test code
   });
 });
 ```
 
-#### 옵션 2: 기존 문서에서 타입 생성
+#### Option 2: Generate Types from Existing Documentation
 
 ```typescript
 import { TypeGenerator } from 'jest-swagger';
 import * as fs from 'fs';
 import * as YAML from 'yaml';
 
-// 기존 swagger.yaml에서 타입 생성
+// Generate types from existing swagger.yaml
 const swaggerContent = fs.readFileSync('./swagger.yaml', 'utf-8');
 const document = YAML.parse(swaggerContent);
 
@@ -495,12 +495,12 @@ const generator = new TypeGenerator();
 await generator.generateToFile(document, './src/types/api.generated.ts');
 ```
 
-생성된 타입을 테스트에서 사용:
+Use generated types in tests:
 
 ```typescript
 import type { User, CreateUserRequest } from './types/api.generated';
 
-test('타입 안전한 사용자 생성', async () => {
+test('Type-safe user creation', async () => {
   const newUser: CreateUserRequest = {
     name: 'John',
     email: 'john@example.com',
@@ -514,16 +514,16 @@ test('타입 안전한 사용자 생성', async () => {
 });
 ```
 
-### 마이그레이션 단계
+### Migration Steps
 
-#### 1단계: 기존 문서 분석
+#### Step 1: Analyze Existing Documentation
 
 ```bash
-# 기존 문서 구조 확인
+# Check existing document structure
 cat swagger.yaml
 ```
 
-#### 2단계: 타입 생성
+#### Step 2: Generate Types
 
 ```typescript
 // scripts/generate-types.ts
@@ -538,11 +538,11 @@ const generator = new TypeGenerator();
 await generator.generateToFile(document, './src/types/api.generated.ts');
 ```
 
-#### 3단계: 테스트에 데코레이터 추가
+#### Step 3: Add Decorators to Tests
 
-기존 엔드포인트별로 테스트를 작성하고 데코레이터를 추가합니다.
+Write tests for each existing endpoint and add decorators.
 
-#### 4단계: Jest 리포터 설정
+#### Step 4: Configure Jest Reporter
 
 ```typescript
 // jest.config.ts
@@ -554,7 +554,7 @@ export default {
       {
         outputPath: './swagger.yaml',
         format: 'yaml',
-        title: 'API 문서',
+        title: 'API Documentation',
         version: '1.0.0',
       },
     ],
@@ -562,44 +562,44 @@ export default {
 };
 ```
 
-#### 5단계: 점진적 마이그레이션
+#### Step 5: Gradual Migration
 
-1. 새로운 엔드포인트부터 jest-swagger 사용
-2. 기존 엔드포인트는 필요에 따라 순차적으로 마이그레이션
-3. 생성된 문서와 기존 문서 비교하여 일관성 확인
+1. Use jest-swagger for new endpoints first
+2. Migrate existing endpoints sequentially as needed
+3. Compare generated documentation with existing documentation to verify consistency
 
 ---
 
-## 일반적인 마이그레이션 팁
+## General Migration Tips
 
-### 1. 타입 안전성 활용
+### 1. Leverage Type Safety
 
-jest-swagger의 가장 큰 장점은 TypeScript 타입 안전성입니다.
+The biggest advantage of jest-swagger is TypeScript type safety.
 
 ```typescript
-// 타입 생성
+// Generate types
 await generator.generateToFile(document, './types/api.ts');
 
-// 테스트에서 사용
+// Use in tests
 import type { User } from './types/api';
 
-test('타입 안전한 테스트', async () => {
+test('Type-safe test', async () => {
   const user: User = await getUser(1);
   expect(user.name).toBeDefined();
 });
 ```
 
-### 2. 점진적 마이그레이션
+### 2. Gradual Migration
 
-한 번에 모든 것을 마이그레이션하지 말고, 점진적으로 진행하세요.
+Don't migrate everything at once; proceed gradually.
 
-1. 새로운 API부터 jest-swagger 사용
-2. 중요한 API 우선 마이그레이션
-3. 레거시 API는 필요시 마이그레이션
+1. Use jest-swagger for new APIs first
+2. Migrate critical APIs with priority
+3. Migrate legacy APIs as needed
 
-### 3. 자동화 스크립트 활용
+### 3. Use Automation Scripts
 
-반복적인 작업은 스크립트로 자동화하세요.
+Automate repetitive tasks with scripts.
 
 ```typescript
 // scripts/migrate.ts
@@ -608,28 +608,28 @@ import * as fs from 'fs';
 function migrateSwaggerJsDoc(filePath: string): void {
   const content = fs.readFileSync(filePath, 'utf-8');
 
-  // JSDoc 주석 찾기
+  // Find JSDoc comments
   const jsdocPattern = /\/\*\*\s*\n\s*\*\s*@swagger\s*\n([\s\S]*?)\*\//g;
 
-  // 데코레이터로 변환
+  // Convert to decorators
   // ...
 
   fs.writeFileSync(filePath, convertedContent);
 }
 ```
 
-### 4. 문서 일관성 검증
+### 4. Verify Documentation Consistency
 
-마이그레이션 후 생성된 문서와 기존 문서를 비교하여 일관성을 확인하세요.
+Compare generated documentation with existing documentation after migration to verify consistency.
 
 ```bash
-# 기존 문서와 새 문서 비교
+# Compare old and new documentation
 diff old-swagger.yaml new-swagger.yaml
 ```
 
-### 5. CI/CD 통합
+### 5. CI/CD Integration
 
-Jest 리포터를 CI/CD 파이프라인에 통합하여 자동으로 문서를 생성하세요.
+Integrate Jest reporter into your CI/CD pipeline to automatically generate documentation.
 
 ```yaml
 # .github/workflows/test.yml
@@ -645,15 +645,15 @@ Jest 리포터를 CI/CD 파이프라인에 통합하여 자동으로 문서를 �
 
 ---
 
-## 문제 해결
+## Troubleshooting
 
-### Q1: 기존 스키마 재사용이 가능한가요?
+### Q1: Can I reuse existing schemas?
 
-**A:** 네, `$ref`를 사용하여 기존 스키마를 참조할 수 있습니다.
+**A:** Yes, you can reference existing schemas using `$ref`.
 
 ```typescript
 @Response(200, {
-  description: '성공',
+  description: 'Success',
   content: {
     'application/json': {
       schema: {
@@ -664,9 +664,9 @@ Jest 리포터를 CI/CD 파이프라인에 통합하여 자동으로 문서를 �
 })
 ```
 
-### Q2: 여러 파일에서 공통 스키마를 사용하려면?
+### Q2: How to use common schemas across multiple files?
 
-**A:** 별도 파일에서 스키마를 정의하고 import하여 사용하세요.
+**A:** Define schemas in a separate file and import them.
 
 ```typescript
 // schemas/user.schema.ts
@@ -682,7 +682,7 @@ export const UserSchema = {
 import { UserSchema } from '../schemas/user.schema';
 
 @Response(200, {
-  description: '성공',
+  description: 'Success',
   content: {
     'application/json': {
       schema: UserSchema,
@@ -691,9 +691,9 @@ import { UserSchema } from '../schemas/user.schema';
 })
 ```
 
-### Q3: 마이그레이션 후 문서가 생성되지 않아요
+### Q3: Documentation is not being generated after migration
 
-**A:** Jest 리포터 설정을 확인하세요.
+**A:** Check your Jest reporter configuration.
 
 ```typescript
 // jest.config.ts
@@ -701,7 +701,7 @@ export default {
   reporters: [
     'default',
     [
-      'jest-swagger/reporters', // 올바른 경로 확인
+      'jest-swagger/reporters', // Verify correct path
       {
         outputPath: './docs/swagger.yaml',
         format: 'yaml',
@@ -713,9 +713,9 @@ export default {
 
 ---
 
-## 추가 리소스
+## Additional Resources
 
-- [API 문서](./API.md)
-- [튜토리얼](./TUTORIAL.md)
-- [예제](../examples)
+- [API Documentation](./API.md)
+- [Tutorial](./TUTORIAL.md)
+- [Examples](../examples)
 - [GitHub Issues](https://github.com/your-repo/jest-swagger/issues)

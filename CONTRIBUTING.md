@@ -1,5 +1,7 @@
 # jest-swagger 기여 가이드
 
+**한국어** | [English](./CONTRIBUTING.en.md)
+
 jest-swagger 프로젝트에 기여해 주셔서 감사합니다!
 
 ## 개발 환경 설정

@@ -1,5 +1,7 @@
 # jest-swagger
 
+**한국어** | [English](./README.en.md)
+
 Jest 테스트에서 Swagger/OpenAPI 문서를 자동 생성하는 TypeScript 라이브러리
 
 ## 개요
