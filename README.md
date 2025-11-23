@@ -1,38 +1,38 @@
 # jest-swagger
 
-**한국어** | [English](./README.en.md)
+**English** | [한국어](./README.ko.md)
 
-Jest 테스트에서 Swagger/OpenAPI 문서를 자동 생성하는 TypeScript 라이브러리
+A TypeScript library for automatically generating Swagger/OpenAPI documentation from Jest tests
 
-## 개요
+## Overview
 
-`jest-swagger`는 Jest 테스트 코드에서 데코레이터와 빌더 패턴을 사용하여 OpenAPI 3.0 문서를 자동으로 생성하는 도구입니다. API 테스트를 작성하면서 동시에 API 문서를 생성할 수 있어, 문서와 코드의 일관성을 보장합니다.
+`jest-swagger` is a tool that automatically generates OpenAPI 3.0 documentation using decorators and builder patterns in Jest test code. You can create API documentation while writing API tests, ensuring consistency between documentation and code.
 
-## 주요 기능
+## Key Features
 
-- ✅ **데코레이터 기반 문서 생성**: TypeScript 데코레이터를 사용한 선언적 API 문서화
-- ✅ **빌더 패턴 지원**: 유연한 Swagger 문서 구축을 위한 빌더 API
-- ✅ **Jest 통합**: Jest 테스트 환경과 완벽하게 통합
-- ✅ **OpenAPI 3.0 지원**: 최신 OpenAPI 3.0 스펙 준수
-- ✅ **TypeScript 우선**: 완전한 타입 안전성과 IntelliSense 지원
-- ✅ **다중 출력 형식**: JSON, YAML 형식으로 문서 출력
-- ✅ **고급 검증**: 스키마 및 응답 자동 검증
+- ✅ **Decorator-based Documentation**: Declarative API documentation using TypeScript decorators
+- ✅ **Builder Pattern Support**: Flexible Swagger document construction with builder API
+- ✅ **Jest Integration**: Seamless integration with Jest testing environment
+- ✅ **OpenAPI 3.0 Support**: Compliant with latest OpenAPI 3.0 specification
+- ✅ **TypeScript First**: Full type safety and IntelliSense support
+- ✅ **Multiple Output Formats**: Export documentation in JSON and YAML formats
+- ✅ **Advanced Validation**: Automatic schema and response validation
 
-## 설치
+## Installation
 
 ```bash
 npm install --save-dev jest-swagger
 ```
 
-또는
+Or using yarn:
 
 ```bash
 yarn add -D jest-swagger
 ```
 
-## 빠른 시작
+## Quick Start
 
-### 1. 데코레이터를 사용한 API 문서화
+### 1. API Documentation with Decorators
 
 ```typescript
 import { SwaggerTest, ApiEndpoint, ApiResponse } from 'jest-swagger';
@@ -40,18 +40,18 @@ import { SwaggerTest, ApiEndpoint, ApiResponse } from 'jest-swagger';
 @SwaggerTest({
   title: 'User API',
   version: '1.0.0',
-  description: '사용자 관리 API'
+  description: 'User Management API'
 })
 describe('User API', () => {
   @ApiEndpoint({
     method: 'GET',
     path: '/users/{id}',
-    summary: '사용자 정보 조회',
+    summary: 'Get user information',
     tags: ['users']
   })
   @ApiResponse({
     status: 200,
-    description: '사용자 정보 조회 성공',
+    description: 'Successfully retrieved user information',
     schema: {
       type: 'object',
       properties: {
@@ -62,12 +62,12 @@ describe('User API', () => {
     }
   })
   it('should get user by id', async () => {
-    // 테스트 코드
+    // Test code
   });
 });
 ```
 
-### 2. 빌더 패턴을 사용한 문서 생성
+### 2. Document Generation with Builder Pattern
 
 ```typescript
 import { SwaggerBuilder } from 'jest-swagger';
@@ -76,14 +76,14 @@ const swagger = new SwaggerBuilder()
   .setInfo({
     title: 'My API',
     version: '1.0.0',
-    description: 'API 설명'
+    description: 'API Description'
   })
   .addPath('/users', {
     get: {
-      summary: '사용자 목록 조회',
+      summary: 'Get user list',
       responses: {
         200: {
-          description: '성공'
+          description: 'Success'
         }
       }
     }
@@ -91,7 +91,7 @@ const swagger = new SwaggerBuilder()
   .build();
 ```
 
-### 3. 문서 생성 및 출력
+### 3. Document Generation and Output
 
 ```typescript
 import { SwaggerReporter } from 'jest-swagger';
@@ -104,78 +104,78 @@ const reporter = new SwaggerReporter({
 reporter.generate();
 ```
 
-## 프로젝트 구조
+## Project Structure
 
 ```
 jest-swagger/
 ├── src/
-│   ├── decorators/       # 데코레이터 구현
-│   ├── builders/         # 빌더 패턴 구현
-│   ├── reporters/        # 문서 생성 및 출력
-│   ├── types/            # TypeScript 타입 정의
-│   └── integrations/     # 외부 통합 (Jest, Express 등)
-├── tests/                # 테스트 파일
+│   ├── decorators/       # Decorator implementations
+│   ├── builders/         # Builder pattern implementations
+│   ├── reporters/        # Document generation and output
+│   ├── types/            # TypeScript type definitions
+│   └── integrations/     # External integrations (Jest, Express, etc.)
+├── tests/                # Test files
 │   ├── decorators/
 │   ├── builders/
 │   ├── reporters/
 │   ├── types/
 │   ├── helpers/
 │   └── fixtures/
-├── docs/                 # 문서
-└── examples/             # 예제 코드
+├── docs/                 # Documentation
+└── examples/             # Example code
 ```
 
-## 개발 환경 설정
+## Development Environment Setup
 
-### 요구사항
+### Requirements
 
 - Node.js >= 16.0.0
 - TypeScript >= 5.0.0
 - Jest >= 29.0.0
 
-### 개발 스크립트
+### Development Scripts
 
 ```bash
-# 의존성 설치
+# Install dependencies
 npm install
 
-# 빌드
+# Build
 npm run build
 
-# 테스트 실행
+# Run tests
 npm test
 
-# 커버리지 포함 테스트
+# Run tests with coverage
 npm run test:coverage
 
-# Watch 모드로 테스트
+# Run tests in watch mode
 npm run test:watch
 
-# 린트 검사
+# Lint check
 npm run lint
 
-# 린트 자동 수정
+# Auto-fix lint issues
 npm run lint:fix
 
-# 코드 포맷팅
+# Code formatting
 npm run format
 
-# 타입 체크
+# Type check
 npm run typecheck
 ```
 
-## 테스트 커버리지
+## Test Coverage
 
-이 프로젝트는 95% 이상의 코드 커버리지를 목표로 합니다.
+This project targets 95% or higher code coverage:
 
 - Branches: 95%
 - Functions: 95%
 - Lines: 95%
 - Statements: 95%
 
-## 기여하기
+## Contributing
 
-기여를 환영합니다! 다음 단계를 따라주세요:
+Contributions are welcome! Please follow these steps:
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -183,34 +183,34 @@ npm run typecheck
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-### 개발 가이드라인
+### Development Guidelines
 
-- TypeScript strict mode 준수
-- 모든 코드에 대한 테스트 작성
-- ESLint 및 Prettier 규칙 준수
-- 커밋 메시지는 명확하고 설명적으로 작성
+- Comply with TypeScript strict mode
+- Write tests for all code
+- Follow ESLint and Prettier rules
+- Write clear and descriptive commit messages
 
-## 로드맵
+## Roadmap
 
-- [ ] 기본 데코레이터 구현 (@SwaggerTest, @ApiEndpoint, @ApiResponse)
-- [ ] SwaggerBuilder 구현
-- [ ] Jest Reporter 통합
-- [ ] OpenAPI 3.0 스키마 검증
-- [ ] Express.js 통합
-- [ ] NestJS 통합
-- [ ] Fastify 통합
-- [ ] 고급 스키마 생성 (TypeScript 타입에서 자동 생성)
-- [ ] 문서 UI 통합 (Swagger UI, ReDoc)
+- [ ] Basic decorator implementation (@SwaggerTest, @ApiEndpoint, @ApiResponse)
+- [ ] SwaggerBuilder implementation
+- [ ] Jest Reporter integration
+- [ ] OpenAPI 3.0 schema validation
+- [ ] Express.js integration
+- [ ] NestJS integration
+- [ ] Fastify integration
+- [ ] Advanced schema generation (auto-generate from TypeScript types)
+- [ ] Documentation UI integration (Swagger UI, ReDoc)
 
-## 라이선스
+## License
 
 MIT License
 
-## 작성자
+## Author
 
-[작성자 이름]
+[Author Name]
 
-## 지원
+## Support
 
-- 이슈: [GitHub Issues](https://github.com/yourusername/jest-swagger/issues)
-- 문서: [Documentation](https://github.com/yourusername/jest-swagger/wiki)
+- Issues: [GitHub Issues](https://github.com/yourusername/jest-swagger/issues)
+- Documentation: [Documentation](https://github.com/yourusername/jest-swagger/wiki)

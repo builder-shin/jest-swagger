@@ -1,61 +1,61 @@
-# jest-swagger 기여 가이드
+# Contributing to jest-swagger
 
-**한국어** | [English](./CONTRIBUTING.en.md)
+[한국어](./CONTRIBUTING.md) | **English**
 
-jest-swagger 프로젝트에 기여해 주셔서 감사합니다!
+Thank you for your interest in contributing to the jest-swagger project!
 
-## 개발 환경 설정
+## Development Environment Setup
 
-### 사전 요구사항
+### Prerequisites
 
 - Node.js >= 16.0.0
-- npm 또는 yarn
+- npm or yarn
 - Git
 
-### 초기 설정
+### Initial Setup
 
 ```bash
-# 저장소 클론
+# Clone repository
 git clone https://github.com/yourusername/jest-swagger.git
 cd jest-swagger
 
-# 의존성 설치
+# Install dependencies
 npm install
 
-# 빌드 확인
+# Verify build
 npm run build
 
-# 테스트 실행
+# Run tests
 npm test
 ```
 
-## 개발 워크플로우
+## Development Workflow
 
-### 1. 브랜치 생성
+### 1. Create Branch
 
 ```bash
-# 기능 개발
+# For feature development
 git checkout -b feature/your-feature-name
 
-# 버그 수정
+# For bug fixes
 git checkout -b fix/bug-description
 
-# 문서 업데이트
+# For documentation updates
 git checkout -b docs/documentation-update
 ```
 
-### 2. 코드 작성
+### 2. Write Code
 
-#### 코드 스타일
+#### Code Style
 
-- TypeScript strict mode 준수
-- ESLint 및 Prettier 규칙 따르기
-- 의미 있는 변수명과 함수명 사용
-- 복잡한 로직에는 주석 추가
+- Follow TypeScript strict mode
+- Adhere to ESLint and Prettier rules
+- Use meaningful variable and function names
+- Add comments for complex logic
 
-#### 테스트 작성
+#### Write Tests
 
-모든 새로운 기능과 버그 수정에는 테스트가 필요합니다:
+All new features and bug fixes require tests:
 
 ```typescript
 describe('YourFeature', () => {
@@ -72,27 +72,27 @@ describe('YourFeature', () => {
 });
 ```
 
-### 3. 코드 검증
+### 3. Code Validation
 
-제출하기 전에 다음을 실행하세요:
+Run the following before submitting:
 
 ```bash
-# 린트 검사
+# Lint check
 npm run lint
 
-# 타입 체크
+# Type check
 npm run typecheck
 
-# 테스트 실행 (커버리지 포함)
+# Run tests (with coverage)
 npm run test:coverage
 
-# 코드 포맷팅
+# Code formatting
 npm run format
 ```
 
-### 4. 커밋
+### 4. Commit
 
-커밋 메시지는 다음 형식을 따릅니다:
+Commit messages follow this format:
 
 ```
 <type>(<scope>): <subject>
@@ -103,15 +103,15 @@ npm run format
 ```
 
 **Type:**
-- `feat`: 새로운 기능
-- `fix`: 버그 수정
-- `docs`: 문서 변경
-- `style`: 코드 포맷팅 (기능 변경 없음)
-- `refactor`: 리팩토링
-- `test`: 테스트 추가/수정
-- `chore`: 빌드 프로세스 또는 도구 변경
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation change
+- `style`: Code formatting (no functionality change)
+- `refactor`: Refactoring
+- `test`: Add/modify tests
+- `chore`: Build process or tool changes
 
-**예시:**
+**Example:**
 
 ```
 feat(decorators): add @ApiParameter decorator
@@ -125,47 +125,47 @@ Closes #123
 
 ### 5. Pull Request
 
-1. 최신 main 브랜치와 동기화
+1. Sync with latest main branch
 ```bash
 git fetch origin
 git rebase origin/main
 ```
 
-2. 변경사항 푸시
+2. Push changes
 ```bash
 git push origin feature/your-feature-name
 ```
 
-3. GitHub에서 Pull Request 생성
-   - 명확한 제목과 설명 작성
-   - 관련 이슈 번호 참조
-   - 스크린샷 또는 예제 코드 포함 (필요시)
+3. Create Pull Request on GitHub
+   - Write clear title and description
+   - Reference related issue numbers
+   - Include screenshots or example code (if needed)
 
-## 코드 리뷰 프로세스
+## Code Review Process
 
-1. 최소 1명의 승인 필요
-2. 모든 CI 체크 통과 필요
-3. 코드 커버리지 95% 이상 유지
-4. 충돌 해결 및 최신 상태 유지
+1. Requires approval from at least 1 reviewer
+2. All CI checks must pass
+3. Maintain code coverage above 95%
+4. Resolve conflicts and stay up to date
 
-## 커버리지 요구사항
+## Coverage Requirements
 
-프로젝트는 다음 커버리지를 유지합니다:
+The project maintains the following coverage levels:
 
 - Branches: 95%
 - Functions: 95%
 - Lines: 95%
 - Statements: 95%
 
-## 문서화
+## Documentation
 
-### 코드 문서화
+### Code Documentation
 
-모든 공개 API에는 JSDoc 주석이 필요합니다:
+All public APIs require JSDoc comments:
 
 ```typescript
 /**
- * Swagger 문서를 생성하는 빌더 클래스
+ * Builder class for generating Swagger documents
  *
  * @example
  * ```typescript
@@ -176,56 +176,56 @@ git push origin feature/your-feature-name
  */
 export class SwaggerBuilder {
   /**
-   * API 정보를 설정합니다
+   * Sets API information
    *
-   * @param info - OpenAPI 정보 객체
-   * @returns 체이닝을 위한 빌더 인스턴스
+   * @param info - OpenAPI info object
+   * @returns Builder instance for chaining
    */
   setInfo(info: OpenAPIInfo): this {
-    // 구현
+    // Implementation
   }
 }
 ```
 
-### README 업데이트
+### README Updates
 
-새로운 기능을 추가할 때는 README.md를 업데이트하세요.
+Update README.md when adding new features.
 
-## 이슈 보고
+## Issue Reporting
 
-버그를 발견했거나 기능을 제안하고 싶으신가요?
+Found a bug or want to suggest a feature?
 
-### 버그 보고
+### Bug Report
 
-다음 정보를 포함해 주세요:
+Please include the following information:
 
-1. 버그 설명
-2. 재현 단계
-3. 예상 동작
-4. 실제 동작
-5. 환경 정보 (Node.js 버전, OS 등)
-6. 가능하다면 최소 재현 코드
+1. Bug description
+2. Steps to reproduce
+3. Expected behavior
+4. Actual behavior
+5. Environment information (Node.js version, OS, etc.)
+6. Minimal reproduction code (if possible)
 
-### 기능 제안
+### Feature Suggestion
 
-다음 정보를 포함해 주세요:
+Please include the following information:
 
-1. 기능 설명
-2. 사용 사례
-3. 예상되는 API 디자인
-4. 대안 고려사항
+1. Feature description
+2. Use cases
+3. Expected API design
+4. Alternative considerations
 
-## 질문이나 도움이 필요하신가요?
+## Questions or Need Help?
 
-- GitHub Discussions 사용
-- 이슈에 'question' 라벨로 등록
-- 관련 문서 확인
+- Use GitHub Discussions
+- Register an issue with 'question' label
+- Check related documentation
 
-## 행동 강령
+## Code of Conduct
 
-- 존중하고 포용적인 환경 유지
-- 건설적인 피드백 제공
-- 다양한 관점 존중
-- 프로젝트와 커뮤니티의 이익 우선
+- Maintain respectful and inclusive environment
+- Provide constructive feedback
+- Respect diverse perspectives
+- Prioritize project and community interests
 
-감사합니다! 🎉
+Thank you! 🎉

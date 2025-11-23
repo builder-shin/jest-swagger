@@ -1,30 +1,30 @@
-# jest-swagger 튜토리얼
+# jest-swagger Tutorial
 
-**한국어** | [English](./TUTORIAL.en.md)
+**English** | [한국어](./TUTORIAL.ko.md)
 
-이 튜토리얼에서는 jest-swagger를 사용하여 Jest 테스트에서 OpenAPI 문서를 자동 생성하는 방법을 단계별로 안내합니다.
+This tutorial provides a step-by-step guide on how to automatically generate OpenAPI documentation from Jest tests using jest-swagger.
 
-## 목차
+## Table of Contents
 
-1. [설치](#1-설치)
-2. [기본 설정](#2-기본-설정)
-3. [첫 번째 API 테스트 작성](#3-첫-번째-api-테스트-작성)
-4. [파라미터 정의](#4-파라미터-정의)
-5. [응답 정의](#5-응답-정의)
-6. [타입 생성](#6-타입-생성)
-7. [고급 기능](#7-고급-기능)
+1. [Installation](#1-installation)
+2. [Basic Setup](#2-basic-setup)
+3. [Writing Your First API Test](#3-writing-your-first-api-test)
+4. [Defining Parameters](#4-defining-parameters)
+5. [Defining Responses](#5-defining-responses)
+6. [Generating Types](#6-generating-types)
+7. [Advanced Features](#7-advanced-features)
 
 ---
 
-## 1. 설치
+## 1. Installation
 
-npm을 사용하여 jest-swagger를 설치합니다.
+Install jest-swagger using npm:
 
 ```bash
 npm install --save-dev jest-swagger
 ```
 
-또는 yarn을 사용합니다.
+Or using yarn:
 
 ```bash
 yarn add --dev jest-swagger
@@ -32,11 +32,11 @@ yarn add --dev jest-swagger
 
 ---
 
-## 2. 기본 설정
+## 2. Basic Setup
 
-### Jest 설정
+### Jest Configuration
 
-`jest.config.ts` 파일을 생성하고 SwaggerReporter를 추가합니다.
+Create a `jest.config.ts` file and add the SwaggerReporter:
 
 ```typescript
 import type { Config } from 'jest';
@@ -51,9 +51,9 @@ const config: Config = {
       {
         outputPath: './docs/swagger.yaml',
         format: 'yaml',
-        title: '사용자 관리 API',
+        title: 'User Management API',
         version: '1.0.0',
-        description: '사용자 생성, 조회, 수정, 삭제 API',
+        description: 'User creation, retrieval, update, and deletion API',
       },
     ],
   ],
@@ -62,9 +62,9 @@ const config: Config = {
 export default config;
 ```
 
-### TypeScript 설정
+### TypeScript Configuration
 
-`tsconfig.json`에 데코레이터 지원을 활성화합니다.
+Enable decorator support in `tsconfig.json`:
 
 ```json
 {
@@ -77,99 +77,99 @@ export default config;
 
 ---
 
-## 3. 첫 번째 API 테스트 작성
+## 3. Writing Your First API Test
 
-간단한 사용자 생성 API 테스트를 작성해 봅시다.
+Let's write a simple user creation API test.
 
-### 테스트 파일: `tests/users.test.ts`
+### Test File: `tests/users.test.ts`
 
 ```typescript
 import { Api, Path, Response } from 'jest-swagger';
 
-describe('사용자 관리 API', () => {
+describe('User Management API', () => {
   @Api({
     tags: ['users'],
-    summary: '사용자 생성',
-    description: '새로운 사용자를 생성합니다.',
+    summary: 'Create a user',
+    description: 'Creates a new user.',
   })
   @Path('post', '/users')
   @Response(201, {
-    description: '사용자가 성공적으로 생성됨',
+    description: 'User successfully created',
     content: {
       'application/json': {
         schema: {
           type: 'object',
           properties: {
-            id: { type: 'number', description: '사용자 ID' },
-            name: { type: 'string', description: '사용자 이름' },
-            email: { type: 'string', description: '이메일 주소' },
+            id: { type: 'number', description: 'User ID' },
+            name: { type: 'string', description: 'User name' },
+            email: { type: 'string', description: 'Email address' },
           },
         },
         example: {
           id: 1,
-          name: '홍길동',
-          email: 'hong@example.com',
+          name: 'John Doe',
+          email: 'john@example.com',
         },
       },
     },
   })
-  test('POST /users - 사용자 생성', async () => {
-    // 실제 API 호출 또는 모의 테스트
+  test('POST /users - Create a user', async () => {
+    // Actual API call or mock test
     const response = await fetch('http://localhost:3000/users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        name: '홍길동',
-        email: 'hong@example.com',
+        name: 'John Doe',
+        email: 'john@example.com',
       }),
     });
 
     expect(response.status).toBe(201);
     const data = await response.json();
     expect(data).toHaveProperty('id');
-    expect(data).toHaveProperty('name', '홍길동');
-    expect(data).toHaveProperty('email', 'hong@example.com');
+    expect(data).toHaveProperty('name', 'John Doe');
+    expect(data).toHaveProperty('email', 'john@example.com');
   });
 });
 ```
 
-### 테스트 실행
+### Running Tests
 
 ```bash
 npm test
 ```
 
-테스트가 실행되면 `docs/swagger.yaml` 파일이 자동으로 생성됩니다.
+When tests run, the `docs/swagger.yaml` file will be automatically generated.
 
 ---
 
-## 4. 파라미터 정의
+## 4. Defining Parameters
 
-이제 파라미터가 있는 API 테스트를 작성해 봅시다.
+Now let's write API tests with parameters.
 
-### 경로 파라미터
+### Path Parameters
 
 ```typescript
 import { Api, Path, Parameter, Response } from 'jest-swagger';
 
 @Api({
   tags: ['users'],
-  summary: '사용자 조회',
-  description: 'ID로 특정 사용자를 조회합니다.',
+  summary: 'Get a user',
+  description: 'Retrieves a specific user by ID.',
 })
 @Path('get', '/users/{id}')
 @Parameter({
   name: 'id',
   in: 'path',
-  description: '사용자 ID',
+  description: 'User ID',
   required: true,
   schema: { type: 'number' },
   example: 1,
 })
 @Response(200, {
-  description: '성공',
+  description: 'Success',
   content: {
     'application/json': {
       schema: {
@@ -184,39 +184,39 @@ import { Api, Path, Parameter, Response } from 'jest-swagger';
   },
 })
 @Response(404, {
-  description: '사용자를 찾을 수 없음',
+  description: 'User not found',
 })
-test('GET /users/{id} - 사용자 조회', async () => {
+test('GET /users/{id} - Get a user', async () => {
   const response = await fetch('http://localhost:3000/users/1');
   expect(response.status).toBe(200);
 });
 ```
 
-### 쿼리 파라미터
+### Query Parameters
 
 ```typescript
 @Api({
   tags: ['users'],
-  summary: '사용자 목록 조회',
-  description: '페이지네이션된 사용자 목록을 조회합니다.',
+  summary: 'Get user list',
+  description: 'Retrieves a paginated list of users.',
 })
 @Path('get', '/users')
 @Parameter({
   name: 'page',
   in: 'query',
-  description: '페이지 번호',
+  description: 'Page number',
   schema: { type: 'number', minimum: 1 },
   example: 1,
 })
 @Parameter({
   name: 'limit',
   in: 'query',
-  description: '페이지 당 항목 수',
+  description: 'Items per page',
   schema: { type: 'number', minimum: 1, maximum: 100 },
   example: 10,
 })
 @Response(200, {
-  description: '성공',
+  description: 'Success',
   content: {
     'application/json': {
       schema: {
@@ -233,35 +233,35 @@ test('GET /users/{id} - 사용자 조회', async () => {
     },
   },
 })
-test('GET /users - 사용자 목록 조회', async () => {
+test('GET /users - Get user list', async () => {
   const response = await fetch('http://localhost:3000/users?page=1&limit=10');
   expect(response.status).toBe(200);
 });
 ```
 
-### 헤더 파라미터
+### Header Parameters
 
 ```typescript
 @Api({
   tags: ['users'],
-  summary: '인증된 사용자 정보 조회',
+  summary: 'Get authenticated user information',
 })
 @Path('get', '/me')
 @Parameter({
   name: 'Authorization',
   in: 'header',
-  description: '인증 토큰',
+  description: 'Authentication token',
   required: true,
   schema: { type: 'string' },
   example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
 })
 @Response(200, {
-  description: '성공',
+  description: 'Success',
 })
 @Response(401, {
-  description: '인증 실패',
+  description: 'Authentication failed',
 })
-test('GET /me - 내 정보 조회', async () => {
+test('GET /me - Get my information', async () => {
   const response = await fetch('http://localhost:3000/me', {
     headers: {
       Authorization: 'Bearer token123',
@@ -273,15 +273,15 @@ test('GET /me - 내 정보 조회', async () => {
 
 ---
 
-## 5. 응답 정의
+## 5. Defining Responses
 
-다양한 응답 시나리오를 정의해 봅시다.
+Let's define various response scenarios.
 
-### 성공 응답
+### Success Responses
 
 ```typescript
 @Response(200, {
-  description: '성공',
+  description: 'Success',
   content: {
     'application/json': {
       schema: {
@@ -301,7 +301,7 @@ test('GET /me - 내 정보 조회', async () => {
         success: true,
         data: {
           id: 1,
-          name: '홍길동',
+          name: 'John Doe',
         },
       },
     },
@@ -309,11 +309,11 @@ test('GET /me - 내 정보 조회', async () => {
 })
 ```
 
-### 에러 응답
+### Error Responses
 
 ```typescript
 @Response(400, {
-  description: '잘못된 요청',
+  description: 'Bad request',
   content: {
     'application/json': {
       schema: {
@@ -333,7 +333,7 @@ test('GET /me - 내 정보 조회', async () => {
         success: false,
         error: {
           code: 'INVALID_INPUT',
-          message: '이메일 형식이 올바르지 않습니다.',
+          message: 'Email format is invalid.',
         },
       },
     },
@@ -343,13 +343,13 @@ test('GET /me - 내 정보 조회', async () => {
 
 ---
 
-## 6. 타입 생성
+## 6. Generating Types
 
-OpenAPI 문서에서 TypeScript 타입을 자동 생성할 수 있습니다.
+You can automatically generate TypeScript types from your OpenAPI documentation.
 
-### 타입 생성 스크립트
+### Type Generation Script
 
-`scripts/generate-types.ts` 파일을 생성합니다.
+Create a `scripts/generate-types.ts` file:
 
 ```typescript
 import { TypeGenerator } from 'jest-swagger';
@@ -357,21 +357,21 @@ import * as fs from 'fs';
 import * as YAML from 'yaml';
 
 async function generateTypes() {
-  // OpenAPI 문서 로드
+  // Load OpenAPI document
   const swaggerContent = fs.readFileSync('./docs/swagger.yaml', 'utf-8');
   const document = YAML.parse(swaggerContent);
 
-  // TypeScript 타입 생성
+  // Generate TypeScript types
   const generator = new TypeGenerator();
   await generator.generateToFile(document, './src/types/api.generated.ts');
 
-  console.log('✅ 타입이 성공적으로 생성되었습니다.');
+  console.log('✅ Types successfully generated.');
 }
 
 generateTypes().catch(console.error);
 ```
 
-### package.json 스크립트 추가
+### Add package.json Script
 
 ```json
 {
@@ -381,19 +381,19 @@ generateTypes().catch(console.error);
 }
 ```
 
-### 타입 생성 실행
+### Run Type Generation
 
 ```bash
 npm run generate-types
 ```
 
-### 생성된 타입 사용
+### Using Generated Types
 
 ```typescript
 import type { User, UserRole } from './types/api.generated';
 
 function createUser(data: User): void {
-  console.log('사용자 생성:', data);
+  console.log('Creating user:', data);
 }
 
 const role: UserRole = 'admin';
@@ -401,13 +401,13 @@ const role: UserRole = 'admin';
 
 ---
 
-## 7. 고급 기능
+## 7. Advanced Features
 
-### 중첩된 객체 스키마
+### Nested Object Schemas
 
 ```typescript
 @Response(200, {
-  description: '성공',
+  description: 'Success',
   content: {
     'application/json': {
       schema: {
@@ -433,11 +433,11 @@ const role: UserRole = 'admin';
 })
 ```
 
-### 배열 응답
+### Array Responses
 
 ```typescript
 @Response(200, {
-  description: '성공',
+  description: 'Success',
   content: {
     'application/json': {
       schema: {
@@ -455,11 +455,11 @@ const role: UserRole = 'admin';
 })
 ```
 
-### Enum 타입
+### Enum Types
 
 ```typescript
 @Response(200, {
-  description: '성공',
+  description: 'Success',
   content: {
     'application/json': {
       schema: {
@@ -468,12 +468,12 @@ const role: UserRole = 'admin';
           role: {
             type: 'string',
             enum: ['admin', 'user', 'guest'],
-            description: '사용자 역할',
+            description: 'User role',
           },
           status: {
             type: 'string',
             enum: ['active', 'inactive', 'pending'],
-            description: '사용자 상태',
+            description: 'User status',
           },
         },
       },
@@ -482,11 +482,11 @@ const role: UserRole = 'admin';
 })
 ```
 
-### 검증 규칙
+### Validation Rules
 
 ```typescript
 @Response(200, {
-  description: '성공',
+  description: 'Success',
   content: {
     'application/json': {
       schema: {
@@ -497,18 +497,18 @@ const role: UserRole = 'admin';
             minLength: 2,
             maxLength: 50,
             pattern: '^[a-zA-Z가-힣]+$',
-            description: '사용자 이름',
+            description: 'User name',
           },
           age: {
             type: 'number',
             minimum: 0,
             maximum: 150,
-            description: '나이',
+            description: 'Age',
           },
           email: {
             type: 'string',
             format: 'email',
-            description: '이메일',
+            description: 'Email',
           },
         },
       },
@@ -517,15 +517,15 @@ const role: UserRole = 'admin';
 })
 ```
 
-### $ref 참조 사용
+### Using $ref References
 
-문서 빌더를 사용하여 재사용 가능한 스키마를 정의할 수 있습니다.
+You can define reusable schemas using the document builder:
 
 ```typescript
 import { DocumentBuilder } from 'jest-swagger';
 
 const document = new DocumentBuilder()
-  .setTitle('사용자 관리 API')
+  .setTitle('User Management API')
   .setVersion('1.0.0')
   .addSchema('User', {
     type: 'object',
@@ -539,11 +539,11 @@ const document = new DocumentBuilder()
   .build();
 ```
 
-그런 다음 응답에서 참조할 수 있습니다:
+Then reference it in responses:
 
 ```typescript
 @Response(200, {
-  description: '성공',
+  description: 'Success',
   content: {
     'application/json': {
       schema: {
@@ -556,8 +556,8 @@ const document = new DocumentBuilder()
 
 ---
 
-## 다음 단계
+## Next Steps
 
-- [API 문서](./API.md)에서 모든 데코레이터와 옵션을 확인하세요.
-- [예제 프로젝트](../examples)에서 실제 사용 사례를 살펴보세요.
-- [마이그레이션 가이드](./MIGRATION.md)에서 다른 도구에서 마이그레이션하는 방법을 확인하세요.
+- Check out the [API Documentation](./API.md) for all decorators and options.
+- Explore real-world use cases in the [example projects](../examples).
+- Learn how to migrate from other tools in the [Migration Guide](./MIGRATION.md).
