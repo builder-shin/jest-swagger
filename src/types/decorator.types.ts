@@ -22,6 +22,8 @@ export interface ApiMetadata {
   description?: string;
   tags?: string[];
   deprecated?: boolean;
+  target: object;
+  propertyKey: string | symbol;
 }
 
 /**
@@ -50,6 +52,20 @@ export interface RequestBodyMetadata {
   schema?: SchemaObject;
   required?: boolean;
   mediaType?: string;
+}
+
+/**
+ * 응답 캡처 메타데이터
+ */
+export interface CaptureMetadata {
+  /** 응답 캡처 활성화 여부 */
+  shouldCapture: boolean;
+  /** HTTP 상태 코드 */
+  statusCode: number;
+  /** 스키마 자동 추론 활성화 여부 */
+  autoInferSchema: boolean;
+  /** 스키마 검증 활성화 여부 */
+  validateSchema: boolean;
 }
 
 /**
@@ -101,3 +117,15 @@ export type ParameterDecorator = (
   propertyKey: string | symbol | undefined,
   parameterIndex: number
 ) => void;
+
+/**
+ * 테스트 메타데이터
+ */
+export interface TestMetadata {
+  /** 대상 클래스 */
+  target: object;
+  /** 메서드 이름 */
+  propertyKey: string | symbol;
+  /** 응답 캡처 활성화 여부 */
+  shouldCapture?: boolean;
+}

@@ -57,6 +57,8 @@
   },
   "dependencies": {
     "@types/joi": "^17.2.2",
+    "ajv": "^8.12.0",
+    "ajv-formats": "^3.0.1",
     "commander": "^14.0.2",
     "joi": "^18.0.2",
     "yaml": "^2.3.4",

@@ -18,6 +18,8 @@ import {
 import { OutputFormatter } from './output-formatter';
 import { metadataStorage } from '../types/metadata-storage';
 import { ApiMetadata } from '../types/decorator.types';
+import { inferSchema } from '../builders/schema-inference';
+import { getFullPath } from '../decorators/path';
 
 /**
  * SwaggerReporter
@@ -229,26 +231,25 @@ export class SwaggerReporter {
     };
 
     // 메타데이터로부터 경로 생성
-    // TODO: 실제로는 데코레이터로 수집된 메타데이터를 사용
-    // 현재는 테스트를 위한 기본 구조만 생성
     const apiMetadata = metadataStorage.getAll();
 
     // API 메타데이터를 OpenAPI 경로로 변환
     apiMetadata.forEach((metadata: ApiMetadata) => {
-      const { path: apiPath, method, tags, summary, description } = metadata;
+      const { path: apiPath, method, tags, summary, description, target, propertyKey } = metadata;
 
-      // path가 정의되지 않은 경우 스킵
-      if (!apiPath) {
-        return;
-      }
+      // 전체 경로 조합 (basePath + path)
+      const basePath = getFullPath(target);
+      const fullPath = apiPath
+        ? (basePath === '/' ? apiPath : `${basePath}${apiPath}`)
+        : basePath;
 
-      if (!document.paths[apiPath]) {
-        document.paths[apiPath] = {};
+      if (!document.paths[fullPath]) {
+        document.paths[fullPath] = {};
       }
 
       const operation: any = {
-        summary: summary || `${method.toUpperCase()} ${apiPath}`,
-        operationId: this.generateOperationId(method, apiPath),
+        summary: summary || `${method.toUpperCase()} ${fullPath}`,
+        operationId: this.generateOperationId(method, fullPath),
       };
 
       if (description) {
@@ -259,14 +260,88 @@ export class SwaggerReporter {
         operation.tags = tags;
       }
 
-      // 기본 응답 설정
-      operation.responses = {
-        '200': {
-          description: 'Success',
-        },
-      };
+      // 응답 메타데이터 조회
+      const responseMetadata = metadataStorage.getResponseMetadata(target, propertyKey);
 
-      (document.paths[apiPath] as any)[method] = operation;
+      if (responseMetadata && responseMetadata.length > 0) {
+        // 응답 메타데이터가 있으면 상세 응답 생성
+        operation.responses = {};
+
+        responseMetadata.forEach((respMeta) => {
+          const statusCode = String(respMeta.statusCode);
+
+          // 캡처된 실제 응답 조회
+          const capturedResponse = metadataStorage.getCapturedResponse(
+            target,
+            propertyKey,
+            respMeta.statusCode
+          );
+
+          // 스키마 결정: 데코레이터 스키마 또는 자동 추론
+          let schema = respMeta.schema;
+          if (!schema && capturedResponse && capturedResponse.body !== null) {
+            try {
+              schema = inferSchema(capturedResponse.body);
+            } catch (error) {
+              // 스키마 추론 실패시 무시
+              this.log('debug', `Failed to infer schema for ${fullPath} ${statusCode}: ${error}`);
+            }
+          }
+
+          // 응답 객체 생성
+          const response: any = {
+            description: respMeta.description || 'Success',
+          };
+
+          // content 생성 (스키마 또는 캡처된 응답이 있는 경우)
+          if (schema || capturedResponse) {
+            // contentType: 캡처된 응답에서 가져오거나 메타데이터 기본값 사용
+            const mediaType =
+              capturedResponse?.contentType || respMeta.mediaType || 'application/json';
+
+            response.content = {
+              [mediaType]: {
+                schema: schema || { type: 'object' },
+              },
+            };
+
+            // 여러 캡처된 응답이 있는지 확인
+            const allCapturedResponses = metadataStorage.getAllCapturedResponses(
+              target,
+              propertyKey,
+              respMeta.statusCode
+            );
+
+            if (allCapturedResponses && allCapturedResponses.length > 1) {
+              // 여러 examples (복수형) 사용
+              const examples: any = {};
+              allCapturedResponses.forEach((capturedResp, index) => {
+                examples[`example${index + 1}`] = {
+                  value: capturedResp.body,
+                  summary: `Example ${index + 1} (captured at ${new Date(
+                    capturedResp.timestamp
+                  ).toISOString()})`,
+                };
+              });
+              response.content[mediaType].examples = examples;
+            } else if (capturedResponse && capturedResponse.body !== null) {
+              // 단일 응답은 example (단수형) 사용
+              response.content[mediaType].example = capturedResponse.body;
+            }
+          }
+
+          operation.responses[statusCode] = response;
+        });
+      } else {
+        // 응답 메타데이터가 없으면 기본 응답 설정
+        operation.responses = {
+          '200': {
+            description: 'Success',
+          },
+        };
+      }
+
+      (document.paths[fullPath] as any)[method] = operation;
     });
 
     return document;

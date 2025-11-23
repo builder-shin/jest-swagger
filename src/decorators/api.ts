@@ -46,6 +46,8 @@ function createApiDecorator(method: HttpMethod) {
         description: finalOptions.description,
         tags: finalOptions.tags,
         deprecated: finalOptions.deprecated,
+        target,
+        propertyKey,
       };
 
       metadataStorage.setApiMetadata(target, propertyKey, metadata);
