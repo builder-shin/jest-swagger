@@ -15,3 +15,6 @@ export { response } from './response';
 
 // 파라미터 데코레이터
 export { query, pathParam, header, cookie, body, ParameterOptions } from './parameters';
+
+// 응답 캡처 데코레이터
+export { CaptureResponse, CaptureOptions } from './capture-response';

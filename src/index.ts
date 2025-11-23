@@ -21,3 +21,12 @@ export * from './integrations';
 
 // 생성기 내보내기
 export * from './generators';
+
+// 캡처 모듈 내보내기
+export { ResponseInterceptor, CapturedResponse } from './capture/response-interceptor';
+
+// 검증 모듈 내보내기
+export * from './validation';
+
+// Jest 훅 내보내기
+export * from './hooks';
