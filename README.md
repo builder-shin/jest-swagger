@@ -202,6 +202,25 @@ Contributions are welcome! Please follow these steps:
 - [ ] Advanced schema generation (auto-generate from TypeScript types)
 - [ ] Documentation UI integration (Swagger UI, ReDoc)
 
+## Publishing
+
+This package is automatically published to NPM using GitHub Actions.
+
+### For Maintainers
+
+See [NPM Publishing Guide](.github/NPM_PUBLISH_GUIDE.md) for detailed instructions on:
+
+- Setting up GitHub Secrets (Organization Secret or Repository Secret)
+- Publishing new versions
+- Troubleshooting publishing issues
+
+**Quick publish:**
+
+```bash
+npm version patch  # or minor, major
+git push --tags
+```
+
 ## License
 
 MIT License

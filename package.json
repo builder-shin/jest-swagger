@@ -31,8 +31,16 @@
     "documentation",
     "typescript"
   ],
-  "author": "",
+  "author": "builder-shin",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/builder-shin/jest-swagger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/builder-shin/jest-swagger/issues"
+  },
+  "homepage": "https://github.com/builder-shin/jest-swagger#readme",
   "devDependencies": {
     "@fastify/cors": "^11.1.0",
     "@nestjs/common": "^11.1.9",

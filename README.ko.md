@@ -202,6 +202,25 @@ npm run typecheck
 - [ ] 고급 스키마 생성 (TypeScript 타입에서 자동 생성)
 - [ ] 문서 UI 통합 (Swagger UI, ReDoc)
 
+## 퍼블리싱
+
+이 패키지는 GitHub Actions를 사용하여 자동으로 NPM에 퍼블리시됩니다.
+
+### 메인테이너를 위한 안내
+
+자세한 사항은 [NPM 퍼블리시 가이드](.github/NPM_PUBLISH_GUIDE.md)를 참조하세요:
+
+- GitHub Secrets 설정 방법 (Organization Secret 또는 Repository Secret)
+- 새 버전 퍼블리시 방법
+- 퍼블리시 문제 해결
+
+**빠른 퍼블리시:**
+
+```bash
+npm version patch  # 또는 minor, major
+git push --tags
+```
+
 ## 라이선스
 
 MIT License

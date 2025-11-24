@@ -1,0 +1,108 @@
+name: NPM Publish
+
+# 워크플로우 트리거 조건
+on:
+  # 태그 푸시 시 (예: v1.0.0)
+  push:
+    tags:
+      - 'v*'
+  # 수동 실행 옵션
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '퍼블리시할 버전 (예: 1.0.0)'
+        required: false
+        type: string
+
+jobs:
+  publish:
+    name: NPM 퍼블리시
+    runs-on: ubuntu-latest
+
+    # Node.js 버전 매트릭스 (선택사항)
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      # 1. 코드 체크아웃
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. Node.js 설정
+      - name: Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+
+      # 3. 의존성 설치
+      - name: 의존성 설치
+        run: npm ci
+
+      # 4. 린트 검사
+      - name: 린트 검사
+        run: npm run lint
+        continue-on-error: false
+
+      # 5. 타입 체크
+      - name: 타입 체크
+        run: npm run typecheck
+        continue-on-error: false
+
+      # 6. 테스트 실행
+      - name: 테스트 실행
+        run: npm test
+        continue-on-error: false
+
+      # 7. 빌드
+      - name: 프로젝트 빌드
+        run: npm run build
+
+      # 8. 빌드 결과물 검증
+      - name: 빌드 결과물 검증
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "❌ dist 디렉토리가 생성되지 않았습니다."
+            exit 1
+          fi
+          if [ ! -f "dist/index.js" ]; then
+            echo "❌ dist/index.js 파일이 생성되지 않았습니다."
+            exit 1
+          fi
+          if [ ! -f "dist/index.d.ts" ]; then
+            echo "❌ dist/index.d.ts 파일이 생성되지 않았습니다."
+            exit 1
+          fi
+          echo "✅ 빌드 결과물 검증 완료"
+
+      # 9. package.json 버전 확인
+      - name: 패키지 버전 확인
+        id: package-version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 현재 패키지 버전: $VERSION"
+
+      # 10. NPM 퍼블리시
+      - name: NPM 퍼블리시
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # 11. 퍼블리시 성공 알림
+      - name: 퍼블리시 성공
+        if: success()
+        run: |
+          echo "✅ jest-swagger@${{ steps.package-version.outputs.version }} 퍼블리시 완료!"
+          echo "📦 NPM 패키지: https://www.npmjs.com/package/jest-swagger"
+
+      # 12. 퍼블리시 실패 알림
+      - name: 퍼블리시 실패
+        if: failure()
+        run: |
+          echo "❌ NPM 퍼블리시 실패"
+          echo "로그를 확인하여 문제를 파악하세요."
