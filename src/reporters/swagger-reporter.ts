@@ -239,9 +239,7 @@ export class SwaggerReporter {
 
       // 전체 경로 조합 (basePath + path)
       const basePath = getFullPath(target);
-      const fullPath = apiPath
-        ? (basePath === '/' ? apiPath : `${basePath}${apiPath}`)
-        : basePath;
+      const fullPath = apiPath ? (basePath === '/' ? apiPath : `${basePath}${apiPath}`) : basePath;
 
       if (!document.paths[fullPath]) {
         document.paths[fullPath] = {};
@@ -284,7 +282,10 @@ export class SwaggerReporter {
               schema = inferSchema(capturedResponse.body);
             } catch (error) {
               // 스키마 추론 실패시 무시
-              this.log('debug', `Failed to infer schema for ${fullPath} ${statusCode}: ${error}`);
+              this.log(
+                'debug',
+                `Failed to infer schema for ${fullPath} ${statusCode}: ${String(error)}`
+              );
             }
           }
 

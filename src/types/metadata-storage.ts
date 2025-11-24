@@ -228,12 +228,7 @@ class GlobalMetadataStorage implements MetadataStorage {
     propertyKey: string | symbol,
     statusCode: number
   ): CapturedResponse[] {
-    return (
-      this.capturedResponses
-        .get(target)
-        ?.get(propertyKey)
-        ?.get(statusCode) || []
-    );
+    return this.capturedResponses.get(target)?.get(propertyKey)?.get(statusCode) || [];
   }
 
   /**
@@ -293,10 +288,7 @@ class GlobalMetadataStorage implements MetadataStorage {
    * @param propertyKey - 메서드 이름
    * @returns 캡처 메타데이터 또는 undefined
    */
-  getCaptureMetadata(
-    target: object,
-    propertyKey: string | symbol
-  ): CaptureMetadata | undefined {
+  getCaptureMetadata(target: object, propertyKey: string | symbol): CaptureMetadata | undefined {
     return this.captureMetadata.get(target)?.get(propertyKey);
   }
 

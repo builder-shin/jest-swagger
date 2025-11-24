@@ -33,27 +33,47 @@ export class ResponseInterceptor {
    * @param response - 캡처할 HTTP 응답 객체
    * @returns 캡처된 응답 객체
    */
-  static capture(response: any): CapturedResponse {
+  static capture(response: unknown): CapturedResponse {
     // undefined 또는 null인 경우 기본 응답 객체로 변환
+    let normalizedResponse: Record<string, unknown>;
     if (response === undefined || response === null) {
-      response = {
+      normalizedResponse = {
         status: 204,
+        data: response,
+      };
+    } else if (typeof response === 'object') {
+      normalizedResponse = response as Record<string, unknown>;
+    } else {
+      normalizedResponse = {
+        status: 200,
         data: response,
       };
     }
 
     // 상태 코드 추출 (status 또는 statusCode 필드 지원)
-    const statusCode = response.status ?? response.statusCode ?? 200;
+    const status = normalizedResponse['status'];
+    const statusCodeField = normalizedResponse['statusCode'];
+    const statusCode =
+      typeof status === 'number'
+        ? status
+        : typeof statusCodeField === 'number'
+          ? statusCodeField
+          : 200;
 
     // 응답 본문 추출 (data 또는 body 필드 지원)
-    const body = response.data ?? response.body ?? null;
+    const data = normalizedResponse['data'];
+    const bodyField = normalizedResponse['body'];
+    const body = data !== undefined ? data : bodyField !== undefined ? bodyField : null;
 
     // 헤더 추출
-    const headers: Record<string, string> = response.headers ?? {};
+    const headersField = normalizedResponse['headers'];
+    const headers: Record<string, string> =
+      typeof headersField === 'object' && headersField !== null
+        ? (headersField as Record<string, string>)
+        : {};
 
     // Content-Type 추출 (헤더에서 가져오거나 기본값 사용)
-    const contentType =
-      headers['content-type'] ?? headers['Content-Type'] ?? 'application/json';
+    const contentType = headers['content-type'] ?? headers['Content-Type'] ?? 'application/json';
 
     // 캡처된 응답 객체 생성
     const captured: CapturedResponse = {

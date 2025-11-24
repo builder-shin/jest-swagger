@@ -138,7 +138,10 @@ export class SchemaValidator {
 
       // 에러 타입별 메시지 커스터마이징
       if (error.keyword === 'required') {
-        const missingProperty = (error.params as any)['missingProperty'];
+        const missingProperty =
+          error.params && 'missingProperty' in error.params
+            ? String(error.params['missingProperty'])
+            : 'unknown';
         message = `필수 프로퍼티 '${missingProperty}'가 누락되었습니다 (required property missing)`;
       } else if (error.keyword === 'type') {
         message = `타입 불일치: ${error.message}`;

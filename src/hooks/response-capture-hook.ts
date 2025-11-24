@@ -23,7 +23,7 @@ import { SchemaValidator } from '../validation/schema-validator';
  * setupResponseCapture();
  * ```
  */
-export function setupResponseCapture(_jestEnv?: any): void {
+export function setupResponseCapture(_jestEnv?: unknown): void {
   // Jest afterEach 훅 등록
   if (typeof afterEach !== 'undefined') {
     afterEach(() => {
@@ -109,7 +109,7 @@ function processResponseCaptures(): void {
 function validateCapturedResponse(
   target: object,
   propertyKey: string | symbol,
-  captured: any
+  captured: { statusCode: number; body: unknown }
 ): void {
   // 응답 메타데이터 조회
   const responseMetadataList = metadataStorage.getResponseMetadata(target, propertyKey);

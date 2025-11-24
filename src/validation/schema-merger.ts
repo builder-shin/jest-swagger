@@ -116,10 +116,7 @@ export class SchemaMerger {
    * @param schema2 - 두 번째 프로퍼티 스키마
    * @returns 병합된 프로퍼티 스키마
    */
-  private static mergePropertySchemas(
-    schema1: SchemaObject,
-    schema2: SchemaObject
-  ): SchemaObject {
+  private static mergePropertySchemas(schema1: SchemaObject, schema2: SchemaObject): SchemaObject {
     // 타입이 동일한 경우
     if (schema1.type === schema2.type) {
       // 객체 타입인 경우 재귀적으로 병합
@@ -131,10 +128,7 @@ export class SchemaMerger {
       if (schema1.type === 'array' && schema1.items && schema2.items) {
         return {
           type: 'array',
-          items: this.mergePropertySchemas(
-            schema1.items as SchemaObject,
-            schema2.items as SchemaObject
-          ),
+          items: this.mergePropertySchemas(schema1.items, schema2.items),
         };
       }
 
